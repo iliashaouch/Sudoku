@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace TP2_Sudoku
 {
+    public struct cell
+    {
+        public int value;
+        public List<int> possibleValues;
+    }
 
     class Sudoku
     {
-
-        public struct cell
-        {
-            public int value;
-            public List<int> possibleValues;
-        }
 
         public Sudoku()
         {
@@ -35,6 +34,34 @@ namespace TP2_Sudoku
         {
 
             return sudokuini;
+        }
+
+
+        public static List<int[]> MRV(cell[,] sudoku)
+        {
+            List<int[]> rep = new List<int[]>();
+            int minimum = sudoku.GetLength(0);
+            for (int i = 0; i < sudoku.GetLength(1); i++)
+            {
+                for (int j = 0; j < sudoku.GetLength(0); j++)
+                {
+                    if (sudoku[i, j].value == 0)
+                    {
+                        if (sudoku[i, j].possibleValues.Count == minimum)
+                        {
+                            rep.Add(new int[] { i, j });
+                        }
+                        if (sudoku[i, j].possibleValues.Count < minimum)
+                        {
+                            minimum = sudoku[i, j].possibleValues.Count;
+                            rep = new List<int[]>();
+                            rep.Add(new int[] { i, j });
+                        }
+                    }
+                }
+            }
+            Console.WriteLine(rep);
+            return rep;
         }
 
         public bool testSolution(int[,] solution)
@@ -101,7 +128,7 @@ namespace TP2_Sudoku
             return true;
         }
 
-        public cell[,] gridToCells(int[,] grid)
+        public static cell[,] gridToCells(int[,] grid)
         {
             cell[,] rep = new cell[grid.GetLength(0), grid.GetLength(1)];
             for (int i = 0; i < grid.GetLength(0); i++)
@@ -115,7 +142,7 @@ namespace TP2_Sudoku
             return rep;
         }
 
-        public List<int> getPossibleValues(int[,] grid, int[] pos)
+        public static List<int> getPossibleValues(int[,] grid, int[] pos)
         {
             List<int> rep = new List<int>();
             if (grid[pos[0], pos[1]] != 0)
