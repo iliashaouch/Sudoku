@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sudoku
+namespace TP2_Sudoku
 {
 
     class Sudoku
@@ -82,7 +82,7 @@ namespace Sudoku
 
         public bool testSolutionBlocs(int[,] solution)
         {
-            for (int a = 0; a < solution.GetLength(0)/3; a++)
+            for (int a = 0; a < solution.GetLength(0) / 3; a++)
             {
                 for (int b = 0; b < solution.GetLength(1) / 3; b++)
                 {
@@ -90,7 +90,7 @@ namespace Sudoku
                     {
                         for (int k = j + 1; k < solution.GetLength(0); k++)
                         {
-                            if (solution[ j/3 + a*3 , j%3 + b*3 ] == solution[ k/3 + a*3 , k%3 + b*3 ])
+                            if (solution[j / 3 + a * 3, j % 3 + b * 3] == solution[k / 3 + a * 3, k % 3 + b * 3])
                             {
                                 return false;
                             }
@@ -107,18 +107,18 @@ namespace Sudoku
             for (int i = 0; i < grid.GetLength(0); i++)
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
-                    {
-                        rep[i, j].value = grid[i, j];
-                        rep[i, j].possibleValues=getPossibleValues(grid,new int[] {i,j});
-                    }
+                {
+                    rep[i, j].value = grid[i, j];
+                    rep[i, j].possibleValues = getPossibleValues(grid, new int[] { i, j });
+                }
             }
             return rep;
         }
 
-        public List<int> getPossibleValues(int [,] grid, int[] pos)
+        public List<int> getPossibleValues(int[,] grid, int[] pos)
         {
             List<int> rep = new List<int>();
-            if (grid[pos[0],pos[1]] != 0)
+            if (grid[pos[0], pos[1]] != 0)
             {
                 return rep;
             }
@@ -126,8 +126,8 @@ namespace Sudoku
             {
                 rep.Add(i);
             }
-            int xbloc =pos[0]/3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
-            int ybloc = pos[1]/3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
+            int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
+            int ybloc = pos[1] / 3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
             for (int i = 0; i < grid.GetLength(0); i++)
             {
                 if (grid[i, pos[1]] != 0 && rep.Contains(grid[i, pos[1]]))
