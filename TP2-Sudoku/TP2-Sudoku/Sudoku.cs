@@ -64,6 +64,98 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        public List<int[]> DegreeHeuristic(cell[,] sudoku, List<int[]> variables)
+        {
+            List<int[]> rep = new List<int[]>();
+            int minConstraints = sudoku.GetLength(0);
+
+            foreach (int[] pos in variables) {
+                int posConstraints = countConstraintsOnOtherVariables(sudoku, pos);
+                if (posConstraints == minConstraints)
+                {
+                    rep.Add(pos);
+                }
+                else if(posConstraints < minConstraints)
+                {
+                    minConstraints = posConstraints;
+                    rep = new List<int[]>();
+                    rep.Add(pos);
+                }
+            }
+            return rep;
+        }
+
+        public int countConstraintsOnOtherVariables(cell[,] sudoku, int[] pos)
+        {
+            int count = 0;
+            int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
+            int ybloc = pos[1] / 3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                if (sudoku[i, pos[1]].value == 0 && i!=pos[0])
+                {
+                    count++;
+                }
+                if (sudoku[pos[0], i].value == 0 && i != pos[1])
+                {
+                    count++;
+                }
+                int x = xbloc + i / 3;
+                int y = ybloc + i % 3;
+                if (sudoku[x, y].value == 0 && i!=4)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public List<int> LeastConstrainingValue(cell[,] sudoku, int[] pos)
+        {
+            List<int> rep = new List<int>();
+            int minimumCount = sudoku.GetLength(0)*3;
+            foreach(int value in sudoku[pos[0], pos[1]].possibleValues)
+            {
+                int valueCount = countConstraintsOnOtherValues(sudoku, pos, value);
+                if (valueCount == minimumCount)
+                {
+                    rep.Add(value);
+                }
+                else if (valueCount < minimumCount)
+                {
+                    minimumCount = valueCount;
+                    rep = new List<int>();
+                    rep.Add(value);
+                }
+            }
+            return rep;
+        }
+
+        public int countConstraintsOnOtherValues(cell[,] sudoku, int[] pos, int studiedValue)
+        {
+            int count = 0;
+            int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
+            int ybloc = pos[1] / 3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                if (sudoku[i, pos[1]].value == 0 && sudoku[i, pos[1]].possibleValues.Contains(studiedValue) && i != pos[0])
+                {
+                    count++;
+                }
+                if (sudoku[pos[0], i].value == 0 && sudoku[pos[0], i].possibleValues.Contains(studiedValue) && i != pos[1])
+                {
+                    count++;
+                }
+                int x = xbloc + i / 3;
+                int y = ybloc + i % 3;
+                if (sudoku[x, y].value == 0 && sudoku[x, y].possibleValues.Contains(studiedValue) && i != 4)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
         public bool testSolution(int[,] solution)
         {
             if (!testSolutionLines(solution) || !testSolutionColumns(solution) || !testSolutionBlocs(solution))
