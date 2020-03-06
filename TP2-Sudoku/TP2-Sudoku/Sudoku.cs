@@ -14,6 +14,9 @@ namespace TP2_Sudoku
 
     class Sudoku
     {
+        private int test = 5;
+
+        public int Test { get => test; set => test = value; }
 
         public Sudoku()
         {

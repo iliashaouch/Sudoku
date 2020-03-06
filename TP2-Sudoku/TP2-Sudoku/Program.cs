@@ -34,6 +34,9 @@ namespace TP2_Sudoku
 
             cell[,] s = Sudoku.gridToCells(grid);
             Sudoku.MRV(s);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
             Console.ReadLine();
         }
     }

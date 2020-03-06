@@ -29,12 +29,29 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            this.sudokuBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.sudokuBindingSource)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // sudokuBindingSource
+            // 
+            this.sudokuBindingSource.DataSource = typeof(TP2_Sudoku.Sudoku);
+            this.sudokuBindingSource.CurrentChanged += new System.EventHandler(this.sudokuBindingSource_CurrentChanged);
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(728, 510);
+            this.Name = "Form1";
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.sudokuBindingSource)).EndInit();
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+        private System.Windows.Forms.BindingSource sudokuBindingSource;
     }
 }
 
