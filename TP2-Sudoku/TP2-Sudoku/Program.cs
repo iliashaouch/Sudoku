@@ -41,8 +41,8 @@ namespace TP2_Sudoku
 
             //var repLeast = Sudoku.LeastConstrainingValue(s, repDegree[0]);
 
-            //var repBackTracking = Sudoku.BackTrackingSearch(s);
-            //Console.WriteLine("Yeaaaaaah !");
+            var repBackTracking = Sudoku.BackTrackingSearch(s);
+            Console.WriteLine("Yeaaaaaah !");
 
             Console.ReadLine();
         }

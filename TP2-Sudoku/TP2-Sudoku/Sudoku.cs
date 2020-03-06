@@ -51,16 +51,19 @@ namespace TP2_Sudoku
         public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
             Console.WriteLine("Searching");
-            if (AssignmentsIsComplete(assignments, sudoku))
+            
+            if (testSolution(sudoku))
             {
-                if (testSolution(sudoku))
-                {
-                    return (assignments, true);
-                }
+                return (assignments, true);
             }
             var variable = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
             if (variable.Count == 0)
             {
+                int IndexOfLastAssignment = assignments.Count - 1;
+                sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]].value = 0;
+                sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]]
+                    .possibleValues.Remove(assignments[IndexOfLastAssignment].value);
+                assignments.RemoveAt(IndexOfLastAssignment);
                 return (assignments, false);
             }
             var values = SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
