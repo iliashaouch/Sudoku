@@ -12,6 +12,12 @@ namespace TP2_Sudoku
         public List<int> possibleValues;
     }
 
+    public struct assignment
+    {
+        public int[] pos;
+        public int value;
+    }
+
     class Sudoku
     {
 
@@ -36,6 +42,86 @@ namespace TP2_Sudoku
             return sudokuini;
         }
 
+        public static (List<assignment>, bool) BackTrackingSearch(cell[,] sudoku)
+        {
+            return RecursiveBackTracking(new List<assignment>(), sudoku);
+        }
+
+        public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments ,cell[,] sudoku)
+        {
+            Console.WriteLine("Searching");
+            if (AssignmentsIsComplete(assignments, sudoku))
+            {
+                if (testSolution(sudoku))
+                {
+                    return (assignments, true);
+                }
+            }
+            var variable = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
+            if (variable.Count == 0)
+            {
+                return (assignments, false);
+            }
+            var values = SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
+            foreach(int value in values)
+            {
+                assignment newAssignment=new assignment();
+                newAssignment.pos = variable[0];
+                newAssignment.value = value;
+                assignments.Add(newAssignment);
+                sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = newAssignment.value;
+                var result = RecursiveBackTracking(assignments, sudoku);
+                if (result.Item2 == true)
+                {
+                    return result;
+                }
+                sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = 0;
+                sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
+                assignments.Remove(newAssignment);
+            }
+            return (assignments, false);
+        }
+
+        public static bool AssignmentsIsComplete(List<assignment> assignments, cell[,] sudoku)
+        {
+            bool rep = false;
+            if (assignments.Count == nbOfVariablesLeft(sudoku))
+            {
+                rep = true;
+            }
+            return rep;
+        }
+
+        public static int nbOfVariablesLeft(cell[,] sudoku)
+        {
+            int rep = 0;
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                for (int j = 0; j < sudoku.GetLength(1); j++)
+                {
+                    if (sudoku[i, j].value == 0)
+                    {
+                        rep++;
+                    }
+                }
+            }
+            return rep;
+        }
+
+        public static List<int[]> SelectUnassignedVariable(cell[,] sudoku)
+        {
+            List<int[]> rep= MRV(sudoku);
+            if (rep.Count != 1)
+            {
+                rep = DegreeHeuristic(sudoku, rep);
+            }
+            return rep;
+        }
+
+        public static List<int> SelectUnassignedValue(cell[,] sudoku, int[] variablePosiiton)
+        {
+            return LeastConstrainingValue(sudoku, variablePosiiton);
+        }
 
         public static List<int[]> MRV(cell[,] sudoku)
         {
@@ -64,7 +150,7 @@ namespace TP2_Sudoku
             return rep;
         }
 
-        public List<int[]> DegreeHeuristic(cell[,] sudoku, List<int[]> variables)
+        public static List<int[]> DegreeHeuristic(cell[,] sudoku, List<int[]> variables)
         {
             List<int[]> rep = new List<int[]>();
             int minConstraints = sudoku.GetLength(0);
@@ -85,7 +171,7 @@ namespace TP2_Sudoku
             return rep;
         }
 
-        public int countConstraintsOnOtherVariables(cell[,] sudoku, int[] pos)
+        public static int countConstraintsOnOtherVariables(cell[,] sudoku, int[] pos)
         {
             int count = 0;
             int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
@@ -110,7 +196,7 @@ namespace TP2_Sudoku
             return count;
         }
 
-        public List<int> LeastConstrainingValue(cell[,] sudoku, int[] pos)
+        public static List<int> LeastConstrainingValue(cell[,] sudoku, int[] pos)
         {
             List<int> rep = new List<int>();
             int minimumCount = sudoku.GetLength(0)*3;
@@ -131,7 +217,7 @@ namespace TP2_Sudoku
             return rep;
         }
 
-        public int countConstraintsOnOtherValues(cell[,] sudoku, int[] pos, int studiedValue)
+        public static int countConstraintsOnOtherValues(cell[,] sudoku, int[] pos, int studiedValue)
         {
             int count = 0;
             int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
@@ -156,7 +242,7 @@ namespace TP2_Sudoku
             return count;
         }
 
-        public bool testSolution(int[,] solution)
+        public static bool testSolution(cell[,] solution)
         {
             if (!testSolutionLines(solution) || !testSolutionColumns(solution) || !testSolutionBlocs(solution))
             {
@@ -165,14 +251,14 @@ namespace TP2_Sudoku
             return true;
         }
 
-        public bool testSolutionLines(int[,] solution)
+        public static bool testSolutionLines(cell[,] solution)
         {
             for (int i = 0; i < solution.GetLength(0); i++)
             {
                 for (int j = 0; j < solution.GetLength(1); j++)
                     for (int k = j + 1; k < solution.GetLength(1); k++)
                     {
-                        if (solution[i, j] == solution[i, k])
+                        if (solution[i, j].value == solution[i, k].value)
                         {
                             return false;
                         }
@@ -181,7 +267,7 @@ namespace TP2_Sudoku
             return true;
         }
 
-        public bool testSolutionColumns(int[,] solution)
+        public static bool testSolutionColumns(cell[,] solution)
         {
             for (int i = 0; i < solution.GetLength(1); i++)
             {
@@ -189,7 +275,7 @@ namespace TP2_Sudoku
                 {
                     for (int k = j + 1; k < solution.GetLength(0); k++)
                     {
-                        if (solution[j, i] == solution[k, i])
+                        if (solution[j, i].value == solution[k, i].value)
                         {
                             return false;
                         }
@@ -199,7 +285,7 @@ namespace TP2_Sudoku
             return true;
         }
 
-        public bool testSolutionBlocs(int[,] solution)
+        public static bool testSolutionBlocs(cell[,] solution)
         {
             for (int a = 0; a < solution.GetLength(0) / 3; a++)
             {
@@ -209,7 +295,7 @@ namespace TP2_Sudoku
                     {
                         for (int k = j + 1; k < solution.GetLength(0); k++)
                         {
-                            if (solution[j / 3 + a * 3, j % 3 + b * 3] == solution[k / 3 + a * 3, k % 3 + b * 3])
+                            if (solution[j / 3 + a * 3, j % 3 + b * 3].value == solution[k / 3 + a * 3, k % 3 + b * 3].value)
                             {
                                 return false;
                             }
@@ -241,7 +327,7 @@ namespace TP2_Sudoku
             {
                 return rep;
             }
-            for (int i = 0; i < grid.GetLength(0); i++)
+            for (int i = 1; i <= grid.GetLength(0); i++)
             {
                 rep.Add(i);
             }

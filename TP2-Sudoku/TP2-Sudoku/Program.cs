@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TP2_Sudoku;
 
+
 namespace TP2_Sudoku
 {
     static class Program
@@ -33,7 +34,8 @@ namespace TP2_Sudoku
             };
 
             cell[,] s = Sudoku.gridToCells(grid);
-            Sudoku.MRV(s);
+            var rep = Sudoku.BackTrackingSearch(s);
+            Console.WriteLine("Yeaaaaaah !");
             Console.ReadLine();
         }
     }
