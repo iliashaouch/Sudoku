@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace TP2_Sudoku
             return RecursiveBackTracking(new List<assignment>(), sudoku);
         }
 
-        public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments ,cell[,] sudoku)
+        public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
             Console.WriteLine("Searching");
             if (AssignmentsIsComplete(assignments, sudoku))
@@ -63,9 +64,9 @@ namespace TP2_Sudoku
                 return (assignments, false);
             }
             var values = SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
-            foreach(int value in values)
+            foreach (int value in values)
             {
-                assignment newAssignment=new assignment();
+                assignment newAssignment = new assignment();
                 newAssignment.pos = variable[0];
                 newAssignment.value = value;
                 assignments.Add(newAssignment);
@@ -110,7 +111,7 @@ namespace TP2_Sudoku
 
         public static List<int[]> SelectUnassignedVariable(cell[,] sudoku)
         {
-            List<int[]> rep= MRV(sudoku);
+            List<int[]> rep = MRV(sudoku);
             if (rep.Count != 1)
             {
                 rep = DegreeHeuristic(sudoku, rep);
@@ -118,9 +119,9 @@ namespace TP2_Sudoku
             return rep;
         }
 
-        public static List<int> SelectUnassignedValue(cell[,] sudoku, int[] variablePosiiton)
+        public static List<int> SelectUnassignedValue(cell[,] sudoku, int[] variablePosition)
         {
-            return LeastConstrainingValue(sudoku, variablePosiiton);
+            return LeastConstrainingValue(sudoku, variablePosition);
         }
 
         public static List<int[]> MRV(cell[,] sudoku)
@@ -137,7 +138,7 @@ namespace TP2_Sudoku
                         {
                             rep.Add(new int[] { i, j });
                         }
-                        if (sudoku[i, j].possibleValues.Count < minimum)
+                        else if (sudoku[i, j].possibleValues.Count < minimum)
                         {
                             minimum = sudoku[i, j].possibleValues.Count;
                             rep = new List<int[]>();
@@ -146,24 +147,25 @@ namespace TP2_Sudoku
                     }
                 }
             }
-            Console.WriteLine(rep);
+            //Console.WriteLine(rep.ToString());
             return rep;
         }
 
         public static List<int[]> DegreeHeuristic(cell[,] sudoku, List<int[]> variables)
         {
             List<int[]> rep = new List<int[]>();
-            int minConstraints = sudoku.GetLength(0);
+            int maxConstraints = 0;
 
-            foreach (int[] pos in variables) {
+            foreach (int[] pos in variables)
+            {
                 int posConstraints = countConstraintsOnOtherVariables(sudoku, pos);
-                if (posConstraints == minConstraints)
+                if (posConstraints == maxConstraints)
                 {
                     rep.Add(pos);
                 }
-                else if(posConstraints < minConstraints)
+                else if (posConstraints > maxConstraints)
                 {
-                    minConstraints = posConstraints;
+                    maxConstraints = posConstraints;
                     rep = new List<int[]>();
                     rep.Add(pos);
                 }
@@ -178,7 +180,7 @@ namespace TP2_Sudoku
             int ybloc = pos[1] / 3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
             for (int i = 0; i < sudoku.GetLength(0); i++)
             {
-                if (sudoku[i, pos[1]].value == 0 && i!=pos[0])
+                if (sudoku[i, pos[1]].value == 0 && i != pos[0])
                 {
                     count++;
                 }
@@ -186,9 +188,10 @@ namespace TP2_Sudoku
                 {
                     count++;
                 }
+
                 int x = xbloc + i / 3;
                 int y = ybloc + i % 3;
-                if (sudoku[x, y].value == 0 && i!=4)
+                if (sudoku[x, y].value == 0 && x != pos[0] && y != pos[1])
                 {
                     count++;
                 }
@@ -199,8 +202,8 @@ namespace TP2_Sudoku
         public static List<int> LeastConstrainingValue(cell[,] sudoku, int[] pos)
         {
             List<int> rep = new List<int>();
-            int minimumCount = sudoku.GetLength(0)*3;
-            foreach(int value in sudoku[pos[0], pos[1]].possibleValues)
+            int minimumCount = sudoku.GetLength(0) * 3;
+            foreach (int value in sudoku[pos[0], pos[1]].possibleValues)
             {
                 int valueCount = countConstraintsOnOtherValues(sudoku, pos, value);
                 if (valueCount == minimumCount)

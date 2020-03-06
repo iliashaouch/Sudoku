@@ -34,8 +34,16 @@ namespace TP2_Sudoku
             };
 
             cell[,] s = Sudoku.gridToCells(grid);
-            var rep = Sudoku.BackTrackingSearch(s);
-            Console.WriteLine("Yeaaaaaah !");
+
+            //var repMRV = Sudoku.MRV(s);
+
+            //var repDegree = Sudoku.DegreeHeuristic(s, repMRV);
+
+            //var repLeast = Sudoku.LeastConstrainingValue(s, repDegree[0]);
+
+            //var repBackTracking = Sudoku.BackTrackingSearch(s);
+            //Console.WriteLine("Yeaaaaaah !");
+
             Console.ReadLine();
         }
     }
