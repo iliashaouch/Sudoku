@@ -131,3 +131,4 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
+/TP2-Sudoku/.vs/TP2-Sudoku/v15/Server/sqlite3

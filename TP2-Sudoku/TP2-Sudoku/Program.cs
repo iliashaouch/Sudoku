@@ -25,25 +25,36 @@ namespace TP2_Sudoku
                 { 3, 2, 1, 7, 0, 4, 0, 0, 0 },
                 { 6, 4, 0, 0, 9, 0, 0, 0, 7 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 4, 5, 9, 0, 0 },
-                { 0, 0, 5, 1, 8, 7, 4, 0, 0 },
-                { 0, 0, 4, 9, 6, 0, 0, 0, 0 },
+                { 0, 0, 2, 0, 4, 5, 9, 0, 0 },
+                { 0, 0, 5, 1, 8, 7, 4, 2, 0 },
+                { 0, 0, 4, 9, 6, 2, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 2, 0, 0, 0, 7, 0, 0, 1, 9 },
-                { 0, 0, 0, 6, 0, 9, 5, 8, 2 }
+                { 2, 0, 0, 4, 7, 0, 0, 1, 9 },
+                { 4, 0, 0, 6, 0, 9, 5, 8, 2 }
             };
-
+            int[,] gridtest =
+            {
+                { 3, 0, 1, 0, 0, 4, 6, 9, 0 },
+                { 6, 0, 8, 0, 9, 3, 1, 5, 7 },
+                { 0, 7, 9, 0, 1, 6, 2, 0, 4 },
+                { 0, 8, 2, 3, 4, 0, 0, 6, 1 },
+                { 9, 0, 5, 1, 0, 7, 4, 2, 3 },
+                { 1, 3, 4, 0, 6, 0, 0, 7, 5 },
+                { 8, 9, 0, 5, 2, 0, 0, 0, 6 },
+                { 2, 5, 6, 0, 7, 8, 3, 0, 9 },
+                { 0, 1, 0, 6, 3, 0, 5, 8, 2 }
+            };
             cell[,] s = Sudoku.gridToCells(grid);
-
+            cell[,] test = Sudoku.gridToCells(gridtest);
             //var repMRV = Sudoku.MRV(s);
 
             //var repDegree = Sudoku.DegreeHeuristic(s, repMRV);
 
             //var repLeast = Sudoku.LeastConstrainingValue(s, repDegree[0]);
 
-            //var repBackTracking = Sudoku.BackTrackingSearch(s);
-            //Console.WriteLine("Yeaaaaaah !");
-
+            var repBackTracking = Sudoku.BackTrackingSearch(test);
+            Console.WriteLine("Yeaaaaaah !");
+            Console.WriteLine(repBackTracking);
             Console.ReadLine();
         }
     }

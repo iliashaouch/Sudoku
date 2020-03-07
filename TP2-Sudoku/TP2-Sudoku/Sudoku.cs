@@ -21,7 +21,7 @@ namespace TP2_Sudoku
 
     class Sudoku
     {
-
+        static int s = 0;
         public Sudoku()
         {
             int[,] grid = {
@@ -50,20 +50,20 @@ namespace TP2_Sudoku
 
         public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
-            Console.WriteLine("Searching");
-            if (AssignmentsIsComplete(assignments, sudoku))
+            string ss = "assign=" + assignments.Count + ",";
+            //Console.WriteLine("Searching");
+            if (testSolution(sudoku))
             {
-                if (testSolution(sudoku))
-                {
-                    return (assignments, true);
-                }
+                return (assignments, true);
             }
             var variable = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
+            ss += "nb position=" + variable.Count + ",";
             if (variable.Count == 0)
             {
                 return (assignments, false);
             }
             var values = SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
+            ss += "nb valeur=" + values.Count + ",";
             foreach (int value in values)
             {
                 assignment newAssignment = new assignment();
@@ -71,13 +71,18 @@ namespace TP2_Sudoku
                 newAssignment.value = value;
                 assignments.Add(newAssignment);
                 sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = newAssignment.value;
+                if (s < assignments.Count)
+                {
+                    s = assignments.Count;
+                }
+            Console.WriteLine(ss);
                 var result = RecursiveBackTracking(assignments, sudoku);
                 if (result.Item2 == true)
                 {
                     return result;
                 }
                 sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = 0;
-                sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
+                //sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
                 assignments.Remove(newAssignment);
             }
             return (assignments, false);
@@ -261,7 +266,7 @@ namespace TP2_Sudoku
                 for (int j = 0; j < solution.GetLength(1); j++)
                     for (int k = j + 1; k < solution.GetLength(1); k++)
                     {
-                        if (solution[i, j].value == solution[i, k].value)
+                        if (solution[i, j].value == solution[i, k].value || solution[i,j].value==0)
                         {
                             return false;
                         }
@@ -278,7 +283,7 @@ namespace TP2_Sudoku
                 {
                     for (int k = j + 1; k < solution.GetLength(0); k++)
                     {
-                        if (solution[j, i].value == solution[k, i].value)
+                        if (solution[j, i].value == solution[k, i].value || solution[i,j].value==0)
                         {
                             return false;
                         }
