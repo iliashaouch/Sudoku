@@ -60,6 +60,11 @@ namespace TP2_Sudoku
             ss += "nb position=" + variable.Count + ",";
             if (variable.Count == 0)
             {
+                int IndexOfLastAssignment = assignments.Count - 1;
+                sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]].value = 0;
+                sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]]
+                    .possibleValues.Remove(assignments[IndexOfLastAssignment].value);
+                assignments.RemoveAt(IndexOfLastAssignment);
                 return (assignments, false);
             }
             var values = SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
