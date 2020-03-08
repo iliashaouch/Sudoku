@@ -48,7 +48,8 @@ namespace TP2_Sudoku
             return RecursiveBackTracking(new List<assignment>(), sudoku);
         }
 
-        public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
+
+            public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
             string ss = "assign=" + assignments.Count + ",";
             //Console.WriteLine("Searching");
@@ -58,6 +59,7 @@ namespace TP2_Sudoku
             }
             var variable = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
             ss += "nb position=" + variable.Count + ",";
+            
             if (variable.Count == 0)
             {
                 int IndexOfLastAssignment = assignments.Count - 1;
@@ -67,30 +69,74 @@ namespace TP2_Sudoku
                 assignments.RemoveAt(IndexOfLastAssignment);
                 return (assignments, false);
             }
-            var values = SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
-            ss += "nb valeur=" + values.Count + ",";
-            foreach (int value in values)
+
+            var possibleValues = sudoku[variable[0][0], variable[0][1]].possibleValues; // SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
+            ss += "nb valeur=" + possibleValues.Count + ",";
+            while(possibleValues.Count>0)
             {
-                assignment newAssignment = new assignment();
-                newAssignment.pos = variable[0];
-                newAssignment.value = value;
-                assignments.Add(newAssignment);
-                sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = newAssignment.value;
-                if (s < assignments.Count)
+                int value = SelectUnassignedValue(sudoku, variable[0])[0];
+                if (ValueRespectsConstraints(value, variable[0], sudoku))
                 {
-                    s = assignments.Count;
+                    assignment newAssignment = new assignment();
+                    newAssignment.pos = variable[0];
+                    newAssignment.value = value;
+                    assignments.Add(newAssignment);
+                    sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = newAssignment.value;
+                    if (s < assignments.Count)
+                    {
+                        s = assignments.Count;
+                    }
+                    Console.WriteLine(ss);
+                    printThisSudoku(sudoku);
+                    var result = RecursiveBackTracking(assignments, sudoku);
+                    if (result.Item2 == true)
+                    {
+                        return result;
+                    }
+                    sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = 0;
+                    sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
+                    assignments.Remove(newAssignment);
                 }
-            Console.WriteLine(ss);
-                var result = RecursiveBackTracking(assignments, sudoku);
-                if (result.Item2 == true)
-                {
-                    return result;
-                }
-                sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = 0;
-                //sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
-                assignments.Remove(newAssignment);
+                possibleValues.Remove(value);
             }
             return (assignments, false);
+        }
+
+        public static bool ValueRespectsConstraints(int value, int[] pos, cell[,] sudoku)
+        {
+            int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
+            int ybloc = pos[1] / 3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                if (sudoku[i, pos[1]].value == value && i != pos[0])
+                {
+                    return false;
+                }
+                if (sudoku[pos[0], i].value == value && i != pos[1])
+                {
+                    return false;
+                }
+                int x = xbloc + i / 3;
+                int y = ybloc + i % 3;
+                if (sudoku[x, y].value == value && i != 4)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static void printThisSudoku(cell[,] sudoku)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                String l = "";
+                for (int j=0; j < 9; j++)
+                {
+                    l += sudoku[i, j].value + " ,";
+                }
+                Console.WriteLine(l);
+            }
         }
 
         public static bool AssignmentsIsComplete(List<assignment> assignments, cell[,] sudoku)
@@ -363,6 +409,13 @@ namespace TP2_Sudoku
                     rep.Remove(grid[x, y]);
                 }
             }
+            String l = "(" + pos[0] + " , " + pos[1] + ") possible values  are : ";
+            
+            foreach (int i in rep)
+            {
+                l += i + " , ";
+            }
+            Console.WriteLine(l);
             return rep;
         }
     }
