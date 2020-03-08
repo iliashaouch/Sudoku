@@ -39,7 +39,6 @@ namespace TP2_Sudoku
 
         public int[,] solveSudoku(int[,] sudokuini)
         {
-
             return sudokuini;
         }
 
@@ -49,7 +48,7 @@ namespace TP2_Sudoku
         }
 
 
-            public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
+        public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
             string ss = "assign=" + assignments.Count + ",";
             //Console.WriteLine("Searching");
@@ -57,28 +56,30 @@ namespace TP2_Sudoku
             {
                 return (assignments, true);
             }
-            var variable = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
-            ss += "nb position=" + variable.Count + ",";
+            var variableList = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
+            ss += "nb position=" + variableList.Count + ",";
             
-            if (variable.Count == 0)
+            if (variableList.Count == 0)
             {
                 int IndexOfLastAssignment = assignments.Count - 1;
                 sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]].value = 0;
-                sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]]
-                    .possibleValues.Remove(assignments[IndexOfLastAssignment].value);
+                //sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]]
+                //    .possibleValues.Remove(assignments[IndexOfLastAssignment].value);
                 assignments.RemoveAt(IndexOfLastAssignment);
                 return (assignments, false);
             }
+            var variable = variableList[0];
 
-            var possibleValues = sudoku[variable[0][0], variable[0][1]].possibleValues; // SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
+            var possibleValues = MyCopy(sudoku[variable[0], variable[1]].possibleValues); // SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
             ss += "nb valeur=" + possibleValues.Count + ",";
             while(possibleValues.Count>0)
             {
-                int value = SelectUnassignedValue(sudoku, variable[0])[0];
-                if (ValueRespectsConstraints(value, variable[0], sudoku))
+                int value = SelectUnassignedValue(sudoku, variable, possibleValues)[0];
+                Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") tested values is : " + value);
+                if (ValueRespectsConstraints(value, variable, sudoku))
                 {
                     assignment newAssignment = new assignment();
-                    newAssignment.pos = variable[0];
+                    newAssignment.pos = variable;
                     newAssignment.value = value;
                     assignments.Add(newAssignment);
                     sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = newAssignment.value;
@@ -94,12 +95,37 @@ namespace TP2_Sudoku
                         return result;
                     }
                     sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = 0;
-                    sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
+                    //sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
                     assignments.Remove(newAssignment);
                 }
-                possibleValues.Remove(value);
+                possibleValues = MyRemove(possibleValues,value);
+                Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + possibleValues.Count);
+                Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + sudoku[variable[0], variable[1]].possibleValues.Count);
             }
             return (assignments, false);
+        }
+
+        public static List<int> MyCopy(List<int> listToCopy)
+        {
+            List<int> rep = new List<int>();
+            foreach (int i in listToCopy)
+            {
+                rep.Add(i);
+            }
+            return rep;
+        }
+
+        public static List<int> MyRemove(List<int> listToScroll, int valueToRemove)
+        {
+            List<int> rep = new List<int>();
+            foreach (int i in listToScroll)
+            {
+                if (i!= valueToRemove)
+                {
+                    rep.Add(i);
+                } 
+            }
+            return rep;
         }
 
         public static bool ValueRespectsConstraints(int value, int[] pos, cell[,] sudoku)
@@ -175,9 +201,9 @@ namespace TP2_Sudoku
             return rep;
         }
 
-        public static List<int> SelectUnassignedValue(cell[,] sudoku, int[] variablePosition)
+        public static List<int> SelectUnassignedValue(cell[,] sudoku, int[] variablePosition, List<int> possibleValues)
         {
-            return LeastConstrainingValue(sudoku, variablePosition);
+            return LeastConstrainingValue(sudoku, variablePosition, possibleValues);
         }
 
         public static List<int[]> MRV(cell[,] sudoku)
@@ -255,11 +281,11 @@ namespace TP2_Sudoku
             return count;
         }
 
-        public static List<int> LeastConstrainingValue(cell[,] sudoku, int[] pos)
+        public static List<int> LeastConstrainingValue(cell[,] sudoku, int[] pos, List<int> possibleValues)
         {
             List<int> rep = new List<int>();
             int minimumCount = sudoku.GetLength(0) * 3;
-            foreach (int value in sudoku[pos[0], pos[1]].possibleValues)
+            foreach (int value in possibleValues)
             {
                 int valueCount = countConstraintsOnOtherValues(sudoku, pos, value);
                 if (valueCount == minimumCount)
