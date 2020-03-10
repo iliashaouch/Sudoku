@@ -72,6 +72,34 @@ namespace TP2_Sudoku
                 { 0, 0, 0, 0, 8, 0, 0, 7, 9 }
             };
 
+            String t = null;
+            String a = null;
+
+            int[,] grilleSudoku = new int[9,9];
+
+            Console.WriteLine("Entre votre sudoku (Appuyez sur entrée pour laissez une case vide :");
+
+            for(int i = 0; i < 9; i++)
+            {
+                for(int j = 0; j < 9; j++)
+                {
+                    a = Console.ReadLine();
+                    if(a == "") { a = "0"; }
+                    while (System.Convert.ToInt32(a) > 9 || a.Length>1)
+                    {
+                        Console.WriteLine("Valeur interdite.Recommencez :");
+                        a = Console.ReadLine();
+                        if (a == "") { a = "0"; }
+                    }
+                    t = t + a + " |";
+                    Console.WriteLine(t);
+                    grilleSudoku[i, j] = System.Convert.ToInt32(a);
+                }
+                t = t + "\n";
+            }
+
+            cell [,] ss = Sudoku.gridToCells(grilleSudoku);
+
             cell[,] s = Sudoku.gridToCells(grid);
             cell[,] test = Sudoku.gridToCells(gridtest2);
             //var repMRV = Sudoku.MRV(s);
@@ -80,9 +108,15 @@ namespace TP2_Sudoku
 
             //var repLeast = Sudoku.LeastConstrainingValue(s, repDegree[0]);
 
-            var repBackTracking = Sudoku.BackTrackingSearch(test);
-            Console.WriteLine("Yeaaaaaah !");
+            var repBackTracking = Sudoku.BackTrackingSearch(ss);
             Console.WriteLine(repBackTracking);
+
+            Console.WriteLine("Grille de départ : \n");
+            Sudoku.printThisSudoku(Sudoku.gridToCells(grilleSudoku));
+            Console.WriteLine("Grille réussie : \n");
+            Sudoku.printThisSudoku(ss);
+
+
             Console.ReadLine();
         }
     }

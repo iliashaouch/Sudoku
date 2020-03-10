@@ -75,7 +75,7 @@ namespace TP2_Sudoku
             while(possibleValues.Count>0)
             {
                 int value = SelectUnassignedValue(sudoku, variable, possibleValues)[0];
-                Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") tested values is : " + value);
+                //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") tested values is : " + value);
                 if (ValueRespectsConstraints(value, variable, sudoku))
                 {
                     assignment newAssignment = new assignment();
@@ -87,7 +87,7 @@ namespace TP2_Sudoku
                     {
                         s = assignments.Count;
                     }
-                    Console.WriteLine(ss);
+                    //Console.WriteLine(ss);
                     printThisSudoku(sudoku);
                     var result = RecursiveBackTracking(assignments, sudoku);
                     if (result.Item2 == true)
@@ -99,8 +99,8 @@ namespace TP2_Sudoku
                     assignments.Remove(newAssignment);
                 }
                 possibleValues = MyRemove(possibleValues,value);
-                Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + possibleValues.Count);
-                Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + sudoku[variable[0], variable[1]].possibleValues.Count);
+                //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + possibleValues.Count);
+                //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + sudoku[variable[0], variable[1]].possibleValues.Count);
             }
             return (assignments, false);
         }
@@ -157,10 +157,11 @@ namespace TP2_Sudoku
             for (int i = 0; i < 9; i++)
             {
                 String l = "";
-                for (int j=0; j < 9; j++)
+                for (int j=0; j < 8; j++)
                 {
                     l += sudoku[i, j].value + " ,";
                 }
+                l += sudoku[i, 8].value;
                 Console.WriteLine(l);
             }
         }
@@ -441,7 +442,7 @@ namespace TP2_Sudoku
             {
                 l += i + " , ";
             }
-            Console.WriteLine(l);
+            //Console.WriteLine(l);
             return rep;
         }
     }
