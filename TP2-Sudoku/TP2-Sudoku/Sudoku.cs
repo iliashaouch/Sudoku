@@ -21,6 +21,27 @@ namespace TP2_Sudoku
 
     class Sudoku
     {
+        static int s = 0;
+        public cell[,] test = new cell[9, 9];
+
+        public Sudoku()
+        {
+            int[,] grid = {
+                { 3, 2, 1, 7, 0, 4, 0, 0, 0 },
+                { 6, 4, 0, 0, 9, 0, 0, 0, 7 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 4, 5, 9, 0, 0 },
+                { 0, 0, 5, 1, 8, 7, 4, 0, 0 },
+                { 0, 0, 4, 9, 6, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 2, 0, 0, 0, 7, 0, 0, 1, 9 },
+                { 0, 0, 0, 6, 0, 9, 5, 8, 2 }
+            };
+        }
+
+        public static int countIteration = 0;
+
+        public cell[,] Test { get => test; set => test = value; }
 
         public static (List<assignment>, bool) BackTrackingSearch(cell[,] sudoku)
         {
@@ -39,6 +60,7 @@ namespace TP2_Sudoku
                 {
                     int[] pos = { Arc[0, 0], Arc[0, 1] };
                     List<int[]> neighbors = getAllNeighbors(sudoku, pos);
+                    //Console.WriteLine(neighbors.Count);
                     foreach (int[] neighbor in neighbors)
                     {
                         int[,] newArc = new int[2, 2];
@@ -83,6 +105,7 @@ namespace TP2_Sudoku
                 {
                     int[] pos = { l, c };
                     List<int[]> neighbors = getAllNeighbors(sudoku, pos);
+                    //Console.WriteLine(neighbors.Count);
                     foreach (int[] neighbor in neighbors)
                     {
                         int[,] Arc = new int[2, 2];
@@ -127,25 +150,34 @@ namespace TP2_Sudoku
 
         public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
+            //Console.WriteLine(countIteration);
+            countIteration++;
+            string ss = "assign=" + assignments.Count + ",";
+            //Console.WriteLine("Searching");
             if (testSolution(sudoku))
             {
                 return (assignments, true);
             }
             var variableList = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
-            
+            ss += "nb position=" + variableList.Count + ",";
+
             if (variableList.Count == 0)
             {
                 int IndexOfLastAssignment = assignments.Count - 1;
                 sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]].value = 0;
+                //sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]]
+                //    .possibleValues.Remove(assignments[IndexOfLastAssignment].value);
                 assignments.RemoveAt(IndexOfLastAssignment);
                 return (assignments, false);
             }
             var variable = variableList[0];
 
-            var possibleValues = MyCopy(sudoku[variable[0], variable[1]].possibleValues); // rend la liste des valeurs possibles pour la première variable
-            while(possibleValues.Count>0)
+            var possibleValues = MyCopy(sudoku[variable[0], variable[1]].possibleValues); // SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
+            ss += "nb valeur=" + possibleValues.Count + ",";
+            while (possibleValues.Count > 0)
             {
                 int value = SelectUnassignedValue(sudoku, variable, possibleValues)[0];
+                //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") tested values is : " + value);
                 if (ValueRespectsConstraints(value, variable, sudoku))
                 {
                     assignment newAssignment = new assignment();
@@ -153,6 +185,11 @@ namespace TP2_Sudoku
                     newAssignment.value = value;
                     assignments.Add(newAssignment);
                     sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = newAssignment.value;
+                    if (s < assignments.Count)
+                    {
+                        s = assignments.Count;
+                    }
+                    //Console.WriteLine(ss);
                     //Console.WriteLine("");
                     //printThisSudoku(sudoku);
                     //Console.WriteLine("");
@@ -162,9 +199,12 @@ namespace TP2_Sudoku
                         return result;
                     }
                     sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = 0;
+                    //sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
                     assignments.Remove(newAssignment);
                 }
-                possibleValues = MyRemove(possibleValues,value);
+                possibleValues = MyRemove(possibleValues, value);
+                //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + possibleValues.Count);
+                //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + sudoku[variable[0], variable[1]].possibleValues.Count);
             }
             return (assignments, false);
         }
@@ -230,6 +270,32 @@ namespace TP2_Sudoku
             }
         }
 
+        public static bool AssignmentsIsComplete(List<assignment> assignments, cell[,] sudoku)
+        {
+            bool rep = false;
+            if (assignments.Count == nbOfVariablesLeft(sudoku))
+            {
+                rep = true;
+            }
+            return rep;
+        }
+
+        public static int nbOfVariablesLeft(cell[,] sudoku)
+        {
+            int rep = 0;
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                for (int j = 0; j < sudoku.GetLength(1); j++)
+                {
+                    if (sudoku[i, j].value == 0)
+                    {
+                        rep++;
+                    }
+                }
+            }
+            return rep;
+        }
+
         public static List<int[]> SelectUnassignedVariable(cell[,] sudoku)
         {
             List<int[]> rep = MRV(sudoku);
@@ -268,6 +334,7 @@ namespace TP2_Sudoku
                     }
                 }
             }
+            //Console.WriteLine(rep.ToString());
             return rep;
         }
 
@@ -473,6 +540,13 @@ namespace TP2_Sudoku
                     rep.Remove(grid[x, y]);
                 }
             }
+            String l = "(" + pos[0] + " , " + pos[1] + ") possible values  are : ";
+
+            foreach (int i in rep)
+            {
+                l += i + " , ";
+            }
+            //Console.WriteLine(l);
             return rep;
         }
     }
