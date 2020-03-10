@@ -37,15 +37,109 @@ namespace TP2_Sudoku
             };
         }
 
-        public int[,] solveSudoku(int[,] sudokuini)
-        {
-            return sudokuini;
-        }
+
 
         public static (List<assignment>, bool) BackTrackingSearch(cell[,] sudoku)
         {
+            sudoku = AC3(sudoku);
             return RecursiveBackTracking(new List<assignment>(), sudoku);
         }
+
+        public static cell[,] AC3(cell[,] sudoku)
+        {
+            List<int[,]> queue = getAllArcs(sudoku);
+            while (queue.Count > 0)
+            {
+                int[,] Arc = queue[0];
+                queue.RemoveAt(0);
+                if (needToRemoveInconsistantValue(sudoku, Arc))
+                {
+                    int[] pos = { Arc[0, 0], Arc[0, 1] };
+                    List<int[]> neighbors = getAllNeighbors(sudoku, pos);
+                    foreach (int[] neighbor in neighbors)
+                    {
+                        int[,] newArc = new int[2, 2];
+                        newArc[0, 0] = pos[0];
+                        newArc[0, 1] = pos[1];
+                        newArc[1, 0] = neighbor[0];
+                        newArc[1, 1] = neighbor[1];
+                        if (!queue.Contains(newArc))
+                        {
+                            queue.Add(newArc);
+                        }
+                    }
+                }
+            }
+
+            return sudoku;
+        }
+
+        public static bool needToRemoveInconsistantValue(cell[,] sudoku, int[,] Arc)
+        {
+            bool neededToRemove = false;
+            int[] pos = { Arc[0, 0], Arc[0, 1] };
+            int[] target = { Arc[1, 0], Arc[1, 1] };
+            if (sudoku[target[0], target[1]].possibleValues.Count == 1
+                && sudoku[pos[0], pos[1]].possibleValues.
+                Contains(sudoku[target[0], target[1]].possibleValues[0]))
+            {
+                sudoku[pos[0], pos[1]].possibleValues.
+                    Remove(sudoku[target[0], target[1]].possibleValues[0]);
+                neededToRemove = true;
+            }
+            return neededToRemove;
+        }
+
+        public static List<int[,]> getAllArcs(cell[,] sudoku)
+        {
+            List<int[,]> rep = new List<int[,]>();
+
+            for (int l = 0; l < sudoku.GetLength(0); l++)
+            {
+                for (int c = 0; c < sudoku.GetLength(1); c++)
+                {
+                    int[] pos = { l, c };
+                    List<int[]> neighbors = getAllNeighbors(sudoku, pos);
+                    foreach (int[] neighbor in neighbors)
+                    {
+                        int[,] Arc = new int[2, 2];
+                        Arc[0, 0] = pos[0];
+                        Arc[0, 1] = pos[1];
+                        Arc[1, 0] = neighbor[0];
+                        Arc[1, 1] = neighbor[1];
+                        rep.Add(Arc);
+                    }
+                }
+            }
+            return rep;
+        }
+
+        public static List<int[]> getAllNeighbors(cell[,] sudoku, int[] pos)
+        {
+            List<int[]> rep = new List<int[]>();
+            int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
+            int ybloc = pos[1] / 3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                if (sudoku[i, pos[1]].value == 0 && i != pos[0])
+                {
+                    rep.Add(new int[] { i, pos[1] });
+                }
+                if (sudoku[pos[0], i].value == 0 && i != pos[1])
+                {
+                    rep.Add(new int[] { pos[0], i });
+                }
+                int x = xbloc + i / 3;
+                int y = ybloc + i % 3;
+                if (sudoku[x, y].value == 0 && i != 4)
+                {
+                    rep.Add(new int[] { x, y });
+                }
+            }
+
+            return rep;
+        }
+
 
 
         public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
@@ -88,7 +182,9 @@ namespace TP2_Sudoku
                         s = assignments.Count;
                     }
                     //Console.WriteLine(ss);
+                    Console.WriteLine("");
                     printThisSudoku(sudoku);
+                    Console.WriteLine("");
                     var result = RecursiveBackTracking(assignments, sudoku);
                     if (result.Item2 == true)
                     {

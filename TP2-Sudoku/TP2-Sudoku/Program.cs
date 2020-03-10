@@ -77,6 +77,7 @@ namespace TP2_Sudoku
 
             int[,] grilleSudoku = new int[9,9];
 
+            /*
             Console.WriteLine("Entre votre sudoku (Appuyez sur entrée pour laissez une case vide :");
 
             for(int i = 0; i < 9; i++)
@@ -97,6 +98,7 @@ namespace TP2_Sudoku
                 }
                 t = t + "\n";
             }
+            */
 
             cell [,] ss = Sudoku.gridToCells(grilleSudoku);
 
@@ -108,13 +110,13 @@ namespace TP2_Sudoku
 
             //var repLeast = Sudoku.LeastConstrainingValue(s, repDegree[0]);
 
-            var repBackTracking = Sudoku.BackTrackingSearch(ss);
+            var repBackTracking = Sudoku.BackTrackingSearch(s);
             Console.WriteLine(repBackTracking);
 
             Console.WriteLine("Grille de départ : \n");
-            Sudoku.printThisSudoku(Sudoku.gridToCells(grilleSudoku));
+            Sudoku.printThisSudoku(Sudoku.gridToCells(gridtest));
             Console.WriteLine("Grille réussie : \n");
-            Sudoku.printThisSudoku(ss);
+            Sudoku.printThisSudoku(s);
 
 
             Console.ReadLine();
