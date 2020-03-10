@@ -138,31 +138,33 @@ namespace TP2_Sudoku
         }
 
 
-
+        // la fonction RecursiveBacktracking prend une liste d'assignements et un sudoku et rend une liste de commentaire et un booléen indiquant si la solution à été trouvée
         public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
             countIteration++;
+            // On test le sudoku pour savoir si il s'agit de la solution
             if (testSolution(sudoku))
             {
                 return (assignments, true);
             }
             var variableList = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
 
-            if (variableList.Count == 0)
+            if (variableList.Count == 0) // si aucune variable n'a été trouvé on revient en arrière
             {
                 int IndexOfLastAssignment = assignments.Count - 1;
                 sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]].value = 0;
                 assignments.RemoveAt(IndexOfLastAssignment);
                 return (assignments, false);
             }
-            var variable = variableList[0];
+            var variable = variableList[0]; // On prend la première variable
 
             var possibleValues = MyCopy(sudoku[variable[0], variable[1]].possibleValues); // rend la liste des valeurs possibles pour la première variable
-            while (possibleValues.Count > 0)
+            while (possibleValues.Count > 0) // Tant que l'on a pas testé l'ensemble des valeurs possibles pour cette variable :
             {
                 int value = SelectUnassignedValue(sudoku, variable, possibleValues)[0];
-                if (ValueRespectsConstraints(value, variable, sudoku))
+                if (ValueRespectsConstraints(value, variable, sudoku)) // si cette valeur respecte les règles du sudoku :
                 {
+                    // on ajoute cette assignement à la liste d'assignements et on rapelle la foncion RecursiveBackTracking
                     assignment newAssignment = new assignment();
                     newAssignment.pos = variable;
                     newAssignment.value = value;
@@ -172,18 +174,22 @@ namespace TP2_Sudoku
                     //printThisSudoku(sudoku);
                     //Console.WriteLine("");
                     var result = RecursiveBackTracking(assignments, sudoku);
-                    if (result.Item2 == true)
+                    if (result.Item2 == true) // si la solution à été trouvé on remonte
                     {
                         return result;
                     }
+                    // sinon on retire cette assignement
                     sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = 0;
                     assignments.Remove(newAssignment);
                 }
+                // on retire la valeure testée de la liste des valeurs possibles
                 possibleValues = MyRemove(possibleValues, value);
             }
+            // si l'étude d'aucune valeur pour cette variable n'a été concluente on remonte
             return (assignments, false);
         }
 
+        // Cette fonction est une fonction de copie de liste personnalisée
         public static List<int> MyCopy(List<int> listToCopy)
         {
             List<int> rep = new List<int>();
@@ -194,6 +200,7 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        // Cette fonction est une fonction retirant l'element recherché d'une liste donnée
         public static List<int> MyRemove(List<int> listToScroll, int valueToRemove)
         {
             List<int> rep = new List<int>();
@@ -207,6 +214,7 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        // Cette fonction vérifie si l'attribution d'une valeur donnée dans une case donnée (de coordonnée "pos") dans un sudoku respecte les règles du sudoku
         public static bool ValueRespectsConstraints(int value, int[] pos, cell[,] sudoku)
         {
             int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
@@ -231,6 +239,7 @@ namespace TP2_Sudoku
             return true;
         }
 
+        // Cette fonction permet l'affichage console d'un sudoku
         public static void printThisSudoku(cell[,] sudoku)
         {
             for (int i = 0; i < 9; i++)
@@ -244,6 +253,7 @@ namespace TP2_Sudoku
                 Console.WriteLine(l);
             }
         }
+
 
         public static List<int[]> SelectUnassignedVariable(cell[,] sudoku)
         {
