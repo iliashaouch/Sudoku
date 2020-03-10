@@ -22,6 +22,8 @@ namespace TP2_Sudoku
     class Sudoku
     {
         static int s = 0;
+        public cell[,] test = new cell[9, 9];
+
         public Sudoku()
         {
             int[,] grid = {
@@ -37,7 +39,9 @@ namespace TP2_Sudoku
             };
         }
 
-        public static int countIteration = 0; 
+        public static int countIteration = 0;
+
+        public cell[,] Test { get => test; set => test = value; }
 
         public static (List<assignment>, bool) BackTrackingSearch(cell[,] sudoku)
         {
@@ -133,7 +137,7 @@ namespace TP2_Sudoku
                 }
                 int x = xbloc + i / 3;
                 int y = ybloc + i % 3;
-                if (sudoku[x, y].value == 0 && x!= pos[0] && y!= pos[1])
+                if (sudoku[x, y].value == 0 && x != pos[0] && y != pos[1])
                 {
                     rep.Add(new int[] { x, y });
                 }
@@ -156,7 +160,7 @@ namespace TP2_Sudoku
             }
             var variableList = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
             ss += "nb position=" + variableList.Count + ",";
-            
+
             if (variableList.Count == 0)
             {
                 int IndexOfLastAssignment = assignments.Count - 1;
@@ -170,7 +174,7 @@ namespace TP2_Sudoku
 
             var possibleValues = MyCopy(sudoku[variable[0], variable[1]].possibleValues); // SelectUnassignedValue(sudoku, variable[0]); // rend la liste des valeurs possibles pour la première variable
             ss += "nb valeur=" + possibleValues.Count + ",";
-            while(possibleValues.Count>0)
+            while (possibleValues.Count > 0)
             {
                 int value = SelectUnassignedValue(sudoku, variable, possibleValues)[0];
                 //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") tested values is : " + value);
@@ -198,7 +202,7 @@ namespace TP2_Sudoku
                     //sudoku[newAssignment.pos[0], newAssignment.pos[1]].possibleValues.Remove(newAssignment.value);
                     assignments.Remove(newAssignment);
                 }
-                possibleValues = MyRemove(possibleValues,value);
+                possibleValues = MyRemove(possibleValues, value);
                 //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + possibleValues.Count);
                 //Console.WriteLine("(" + variable[0] + " , " + variable[1] + ") possible value : " + sudoku[variable[0], variable[1]].possibleValues.Count);
             }
@@ -220,10 +224,10 @@ namespace TP2_Sudoku
             List<int> rep = new List<int>();
             foreach (int i in listToScroll)
             {
-                if (i!= valueToRemove)
+                if (i != valueToRemove)
                 {
                     rep.Add(i);
-                } 
+                }
             }
             return rep;
         }
@@ -257,7 +261,7 @@ namespace TP2_Sudoku
             for (int i = 0; i < 9; i++)
             {
                 String l = "";
-                for (int j=0; j < 8; j++)
+                for (int j = 0; j < 8; j++)
                 {
                     l += sudoku[i, j].value + " ,";
                 }
@@ -444,7 +448,7 @@ namespace TP2_Sudoku
                 for (int j = 0; j < solution.GetLength(1); j++)
                     for (int k = j + 1; k < solution.GetLength(1); k++)
                     {
-                        if (solution[i, j].value == solution[i, k].value || solution[i,j].value==0)
+                        if (solution[i, j].value == solution[i, k].value || solution[i, j].value == 0)
                         {
                             return false;
                         }
@@ -461,7 +465,7 @@ namespace TP2_Sudoku
                 {
                     for (int k = j + 1; k < solution.GetLength(0); k++)
                     {
-                        if (solution[j, i].value == solution[k, i].value || solution[i,j].value==0)
+                        if (solution[j, i].value == solution[k, i].value || solution[i, j].value == 0)
                         {
                             return false;
                         }
@@ -537,7 +541,7 @@ namespace TP2_Sudoku
                 }
             }
             String l = "(" + pos[0] + " , " + pos[1] + ") possible values  are : ";
-            
+
             foreach (int i in rep)
             {
                 l += i + " , ";
