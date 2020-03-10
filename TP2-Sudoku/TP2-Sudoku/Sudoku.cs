@@ -37,7 +37,7 @@ namespace TP2_Sudoku
             };
         }
 
-
+        public static int countIteration = 0; 
 
         public static (List<assignment>, bool) BackTrackingSearch(cell[,] sudoku)
         {
@@ -56,6 +56,7 @@ namespace TP2_Sudoku
                 {
                     int[] pos = { Arc[0, 0], Arc[0, 1] };
                     List<int[]> neighbors = getAllNeighbors(sudoku, pos);
+                    Console.WriteLine(neighbors.Count);
                     foreach (int[] neighbor in neighbors)
                     {
                         int[,] newArc = new int[2, 2];
@@ -100,6 +101,7 @@ namespace TP2_Sudoku
                 {
                     int[] pos = { l, c };
                     List<int[]> neighbors = getAllNeighbors(sudoku, pos);
+                    Console.WriteLine(neighbors.Count);
                     foreach (int[] neighbor in neighbors)
                     {
                         int[,] Arc = new int[2, 2];
@@ -131,7 +133,7 @@ namespace TP2_Sudoku
                 }
                 int x = xbloc + i / 3;
                 int y = ybloc + i % 3;
-                if (sudoku[x, y].value == 0 && i != 4)
+                if (sudoku[x, y].value == 0 && x!= pos[0] && y!= pos[1])
                 {
                     rep.Add(new int[] { x, y });
                 }
@@ -144,6 +146,8 @@ namespace TP2_Sudoku
 
         public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
+            Console.WriteLine(countIteration);
+            countIteration++;
             string ss = "assign=" + assignments.Count + ",";
             //Console.WriteLine("Searching");
             if (testSolution(sudoku))
@@ -240,7 +244,7 @@ namespace TP2_Sudoku
                 }
                 int x = xbloc + i / 3;
                 int y = ybloc + i % 3;
-                if (sudoku[x, y].value == value && i != 4)
+                if (sudoku[x, y].value == value && x != pos[0] && y != pos[1])
                 {
                     return false;
                 }
@@ -416,7 +420,7 @@ namespace TP2_Sudoku
                 }
                 int x = xbloc + i / 3;
                 int y = ybloc + i % 3;
-                if (sudoku[x, y].value == 0 && sudoku[x, y].possibleValues.Contains(studiedValue) && i != 4)
+                if (sudoku[x, y].value == 0 && sudoku[x, y].possibleValues.Contains(studiedValue) && x != pos[0] && y != pos[1])
                 {
                     count++;
                 }
