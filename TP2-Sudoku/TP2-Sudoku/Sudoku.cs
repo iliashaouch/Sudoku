@@ -56,7 +56,7 @@ namespace TP2_Sudoku
                 {
                     int[] pos = { Arc[0, 0], Arc[0, 1] };
                     List<int[]> neighbors = getAllNeighbors(sudoku, pos);
-                    Console.WriteLine(neighbors.Count);
+                    //Console.WriteLine(neighbors.Count);
                     foreach (int[] neighbor in neighbors)
                     {
                         int[,] newArc = new int[2, 2];
@@ -101,7 +101,7 @@ namespace TP2_Sudoku
                 {
                     int[] pos = { l, c };
                     List<int[]> neighbors = getAllNeighbors(sudoku, pos);
-                    Console.WriteLine(neighbors.Count);
+                    //Console.WriteLine(neighbors.Count);
                     foreach (int[] neighbor in neighbors)
                     {
                         int[,] Arc = new int[2, 2];
@@ -146,7 +146,7 @@ namespace TP2_Sudoku
 
         public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
-            Console.WriteLine(countIteration);
+            //Console.WriteLine(countIteration);
             countIteration++;
             string ss = "assign=" + assignments.Count + ",";
             //Console.WriteLine("Searching");
@@ -186,9 +186,9 @@ namespace TP2_Sudoku
                         s = assignments.Count;
                     }
                     //Console.WriteLine(ss);
-                    Console.WriteLine("");
-                    printThisSudoku(sudoku);
-                    Console.WriteLine("");
+                    //Console.WriteLine("");
+                    //printThisSudoku(sudoku);
+                    //Console.WriteLine("");
                     var result = RecursiveBackTracking(assignments, sudoku);
                     if (result.Item2 == true)
                     {
