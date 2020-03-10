@@ -50,13 +50,13 @@ namespace TP2_Sudoku
             SetupLayout();
             Setup_Grid_ori();
             Setup_Grid_sol();
-            remplitGrid_ori();
-            remplitGrid_solv();
         }
 
         private void SetupLayout()
         {
             this.Size = new Size(1050, 590);
+            this.MaximumSize = this.Size;
+            this.MinimumSize = this.Size;
 
             resolveButton.Text = "Resolve";
             resolveButton.Location = new Point(10, 10);
@@ -87,23 +87,21 @@ namespace TP2_Sudoku
                     ori[i, j].Multiline = true;
                     ori[i, j].Size = new Size(50, 50);
                     ori[i, j].Location = new Point(10 + ((j) * 55), 10 + ((i) * 55));
-                    ori[i, j].ReadOnly = true;
+                    ori[i, j].ReadOnly = false;
                     ori[i, j].TextAlign = HorizontalAlignment.Center;
                     ori[i, j].TabStop = false;
-                    ori[i, j].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Regular);
+                    ori[i, j].Font = new Font(FontFamily.GenericSansSerif, 20, FontStyle.Bold);
                     ori[i, j].Cursor = Cursors.Default;
-                    //textBoxes[i, j].ContextMenuStrip = mnuInput;
                     if ((i + j) % 2 == 0)
                     {
                         ori[i, j].BackColor = Color.LightBlue;
                     }
                     this.Controls.Add(ori[i, j]);
-                    //textBoxes[i, j].MouseDown += new MouseEventHandler(HandleInput);
+                    //ori[i, j].MouseDown += new MouseEventHandler(handleInput);
                 }
             }
-            //grid = new SudokuGrid();
-            //UpdateDisplay();
         }
+
 
         private void Setup_Grid_sol()
         {
@@ -118,9 +116,10 @@ namespace TP2_Sudoku
                     solv[i, j].Size = new Size(50, 50);
                     solv[i, j].Location = new Point(525 + ((j) * 55), 10 + ((i) * 55));
                     solv[i, j].ReadOnly = true;
+                    solv[i, j].Enabled = false;
                     solv[i, j].TextAlign = HorizontalAlignment.Center;
                     solv[i, j].TabStop = false;
-                    solv[i, j].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Regular);
+                    solv[i, j].Font = new Font(FontFamily.GenericSansSerif, 20, FontStyle.Bold);
                     solv[i, j].Cursor = Cursors.Default;
                     //textBoxes[i, j].ContextMenuStrip = mnuInput;
                     if ((i + j) % 2 == 0)
@@ -150,9 +149,9 @@ namespace TP2_Sudoku
         private void remplitGrid_solv()
         {
             Sudoku.BackTrackingSearch(sud);
-            for(int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; i++)
             {
-                for(int j = 0; j < 9; j++)
+                for (int j = 0; j < 9; j++)
                 {
                     solv[i, j].Text = sud[i, j].value.ToString();
                 }
@@ -168,8 +167,39 @@ namespace TP2_Sudoku
 
         private void resolveButton_Click(object sender, EventArgs e)
         {
-
+            int[,] temp = new int[9, 9];
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (int.TryParse(ori[i, j].Text, out temp[i, j])) ;
+                    else temp[i, j] = 0;
+                }
+            }
+            //sud = Sudoku.gridToCells(temp);
+            Sudoku.BackTrackingSearch(sud);
+            remplitGrid_solv();
         }
         #endregion
+
+        /* private void mnuInput_Opening(object sender, CancelEventArgs e)
+         {
+             ContextMenu menu;
+             mnuInput.Items.Clear();
+             if (grid[tempR, tempC].Value == 0)
+             {
+                 for (int i = 1; i <= 9; i++)
+                 {
+                     if (grid[tempR, tempC][i] == 0)
+                     {
+                         mnuInput.Items.Add("Make " + i);
+                     }
+                 }
+             }
+             else
+             {
+                 mnuInput.Items.Add("Remove Number");
+             }
+         }*/
     }
 }
