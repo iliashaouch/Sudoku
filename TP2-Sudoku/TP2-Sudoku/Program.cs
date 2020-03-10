@@ -16,11 +16,11 @@ namespace TP2_Sudoku
         [STAThread]
         static void Main()
         {
-            /*
+            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
-            */
+            
 
             int[,] grid = {
                 { 3, 2, 1, 7, 0, 4, 0, 0, 0 },

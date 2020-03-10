@@ -137,7 +137,7 @@ namespace TP2_Sudoku
                 }
                 int x = xbloc + i / 3;
                 int y = ybloc + i % 3;
-                if (sudoku[x, y].value == 0 && x!= pos[0] && y!= pos[1])
+                if (sudoku[x, y].value == 0 && x != pos[0] && y != pos[1])
                 {
                     rep.Add(new int[] { x, y });
                 }
@@ -224,10 +224,10 @@ namespace TP2_Sudoku
             List<int> rep = new List<int>();
             foreach (int i in listToScroll)
             {
-                if (i!= valueToRemove)
+                if (i != valueToRemove)
                 {
                     rep.Add(i);
-                } 
+                }
             }
             return rep;
         }
@@ -261,7 +261,7 @@ namespace TP2_Sudoku
             for (int i = 0; i < 9; i++)
             {
                 String l = "";
-                for (int j=0; j < 8; j++)
+                for (int j = 0; j < 8; j++)
                 {
                     l += sudoku[i, j].value + " ,";
                 }
@@ -448,7 +448,7 @@ namespace TP2_Sudoku
                 for (int j = 0; j < solution.GetLength(1); j++)
                     for (int k = j + 1; k < solution.GetLength(1); k++)
                     {
-                        if (solution[i, j].value == solution[i, k].value || solution[i,j].value==0)
+                        if (solution[i, j].value == solution[i, k].value || solution[i, j].value == 0)
                         {
                             return false;
                         }
@@ -465,7 +465,7 @@ namespace TP2_Sudoku
                 {
                     for (int k = j + 1; k < solution.GetLength(0); k++)
                     {
-                        if (solution[j, i].value == solution[k, i].value || solution[i,j].value==0)
+                        if (solution[j, i].value == solution[k, i].value || solution[i, j].value == 0)
                         {
                             return false;
                         }
