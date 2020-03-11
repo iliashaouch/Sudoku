@@ -15,6 +15,7 @@ namespace TP2_Sudoku
         private Panel buttonPan = new Panel();
         private Button resolveButton = new Button();
         private Button loadButton = new Button();
+        private Label status = new Label();
 
         private TextBox[,] ori = new TextBox[9, 9];
         private TextBox[,] solv = new TextBox[9, 9];
@@ -24,25 +25,10 @@ namespace TP2_Sudoku
         public Form1()
         {
             InitializeComponent();
-            int[,] grid = {
-                { 3, 2, 1, 7, 0, 4, 0, 0, 0 },
-                { 6, 4, 0, 0, 9, 0, 0, 0, 7 },
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 2, 0, 4, 5, 9, 0, 0 },
-                { 0, 0, 5, 1, 8, 7, 4, 2, 0 },
-                { 0, 0, 4, 9, 6, 2, 0, 0, 0 },
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 2, 0, 0, 4, 7, 0, 0, 1, 9 },
-                { 4, 0, 0, 6, 0, 9, 5, 8, 2 }
-            };
-            this.sud = Sudoku.gridToCells(grid);
             this.Load += new EventHandler(FormLoad);
         }
 
-        private void sudokuBindingSource_CurrentChanged(object sender, EventArgs e)
-        {
 
-        }
 
         #region setup
         private void FormLoad(Object sender, EventArgs e)
@@ -66,8 +52,15 @@ namespace TP2_Sudoku
             loadButton.Location = new Point(100, 10);
             loadButton.Click += new EventHandler(loadButton_Click);
 
+            status.Text = "";
+            status.Font = new Font(FontFamily.GenericSansSerif, 16, FontStyle.Bold);
+            status.Location = new Point(700, 0);
+            status.AutoSize = true;
+            status.Visible = true;
+
             buttonPan.Controls.Add(resolveButton);
             buttonPan.Controls.Add(loadButton);
+            buttonPan.Controls.Add(status);
             buttonPan.Height = 50;
             buttonPan.Dock = DockStyle.Bottom;
 
@@ -97,7 +90,6 @@ namespace TP2_Sudoku
                         ori[i, j].BackColor = Color.LightBlue;
                     }
                     this.Controls.Add(ori[i, j]);
-                    //ori[i, j].MouseDown += new MouseEventHandler(handleInput);
                 }
             }
         }
@@ -121,17 +113,13 @@ namespace TP2_Sudoku
                     solv[i, j].TabStop = false;
                     solv[i, j].Font = new Font(FontFamily.GenericSansSerif, 20, FontStyle.Bold);
                     solv[i, j].Cursor = Cursors.Default;
-                    //textBoxes[i, j].ContextMenuStrip = mnuInput;
                     if ((i + j) % 2 == 0)
                     {
                         solv[i, j].BackColor = Color.LightBlue;
                     }
                     this.Controls.Add(solv[i, j]);
-                    //textBoxes[i, j].MouseDown += new MouseEventHandler(HandleInput);
                 }
             }
-            //grid = new SudokuGrid();
-            //UpdateDisplay();
         }
 
 
@@ -148,7 +136,6 @@ namespace TP2_Sudoku
 
         private void remplitGrid_solv()
         {
-            Sudoku.BackTrackingSearch(sud);
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
@@ -162,11 +149,12 @@ namespace TP2_Sudoku
         #region button
         private void loadButton_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("Fonction non implémenter dans les delais accordes, navre", "ERREUR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void resolveButton_Click(object sender, EventArgs e)
         {
+            status.Text = "CALCULATING...";
             int[,] temp = new int[9, 9];
             for (int i = 0; i < 9; i++)
             {
@@ -176,30 +164,12 @@ namespace TP2_Sudoku
                     else temp[i, j] = 0;
                 }
             }
-            //sud = Sudoku.gridToCells(temp);
-            Sudoku.BackTrackingSearch(sud);
+            sud = Sudoku.gridToCells(temp);
+            var rep = Sudoku.BackTrackingSearch(sud);
+            if (rep.Item2) status.Text = "DONE";
+            else status.Text = "NO SOLUTION FOUND";
             remplitGrid_solv();
         }
         #endregion
-
-        /* private void mnuInput_Opening(object sender, CancelEventArgs e)
-         {
-             ContextMenu menu;
-             mnuInput.Items.Clear();
-             if (grid[tempR, tempC].Value == 0)
-             {
-                 for (int i = 1; i <= 9; i++)
-                 {
-                     if (grid[tempR, tempC][i] == 0)
-                     {
-                         mnuInput.Items.Add("Make " + i);
-                     }
-                 }
-             }
-             else
-             {
-                 mnuInput.Items.Add("Remove Number");
-             }
-         }*/
     }
 }
