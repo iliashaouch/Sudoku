@@ -23,7 +23,6 @@ namespace TP2_Sudoku
 
     class Sudoku
     {
-        public static int countIteration=0;
 
         // la fonction BacktrackingSearch prend en paramètre un sudoku et rend la liste des assignments attribués pour le compléter et un booléen 
         // indiquant si la solution à bien été trouvée
@@ -31,7 +30,6 @@ namespace TP2_Sudoku
         {
             sudoku = AC3(sudoku); // On commence par réaliser un AC-3 sur notre sudoku afin de réduire le nombre de valeurs possibles originalement
             var rep = RecursiveBackTracking(new List<assignment>(), sudoku);
-            Console.WriteLine(countIteration);
             return rep; // on appelle ensuite la fonction RecursiveBackTracking qui résoudra le sudoku
         }
 
@@ -138,31 +136,32 @@ namespace TP2_Sudoku
         }
 
 
-
+        // la fonction RecursiveBacktracking prend une liste d'assignements et un sudoku et rend une liste de commentaire et un booléen indiquant si la solution à été trouvée
         public static (List<assignment>, bool) RecursiveBackTracking(List<assignment> assignments, cell[,] sudoku)
         {
-            countIteration++;
+            // On test le sudoku pour savoir si il s'agit de la solution
             if (testSolution(sudoku))
             {
                 return (assignments, true);
             }
             var variableList = SelectUnassignedVariable(sudoku); // rend la liste de variables prioritaires
 
-            if (variableList.Count == 0)
+            if (variableList.Count == 0) // si aucune variable n'a été trouvé on revient en arrière
             {
                 int IndexOfLastAssignment = assignments.Count - 1;
                 sudoku[assignments[IndexOfLastAssignment].pos[0], assignments[IndexOfLastAssignment].pos[1]].value = 0;
                 assignments.RemoveAt(IndexOfLastAssignment);
                 return (assignments, false);
             }
-            var variable = variableList[0];
+            var variable = variableList[0]; // On prend la première variable
 
             var possibleValues = MyCopy(sudoku[variable[0], variable[1]].possibleValues); // rend la liste des valeurs possibles pour la première variable
-            while (possibleValues.Count > 0)
+            while (possibleValues.Count > 0) // Tant que l'on a pas testé l'ensemble des valeurs possibles pour cette variable :
             {
                 int value = SelectUnassignedValue(sudoku, variable, possibleValues)[0];
-                if (ValueRespectsConstraints(value, variable, sudoku))
+                if (ValueRespectsConstraints(value, variable, sudoku)) // si cette valeur respecte les règles du sudoku :
                 {
+                    // on ajoute cette assignement à la liste d'assignements et on rapelle la foncion RecursiveBackTracking
                     assignment newAssignment = new assignment();
                     newAssignment.pos = variable;
                     newAssignment.value = value;
@@ -172,18 +171,22 @@ namespace TP2_Sudoku
                     //printThisSudoku(sudoku);
                     //Console.WriteLine("");
                     var result = RecursiveBackTracking(assignments, sudoku);
-                    if (result.Item2 == true)
+                    if (result.Item2 == true) // si la solution à été trouvé on remonte
                     {
                         return result;
                     }
+                    // sinon on retire cette assignement
                     sudoku[newAssignment.pos[0], newAssignment.pos[1]].value = 0;
                     assignments.Remove(newAssignment);
                 }
+                // on retire la valeure testée de la liste des valeurs possibles
                 possibleValues = MyRemove(possibleValues, value);
             }
+            // si l'étude d'aucune valeur pour cette variable n'a été concluente on remonte
             return (assignments, false);
         }
 
+        // Cette fonction est une fonction de copie de liste personnalisée
         public static List<int> MyCopy(List<int> listToCopy)
         {
             List<int> rep = new List<int>();
@@ -194,6 +197,7 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        // Cette fonction est une fonction retirant l'element recherché d'une liste donnée
         public static List<int> MyRemove(List<int> listToScroll, int valueToRemove)
         {
             List<int> rep = new List<int>();
@@ -207,6 +211,7 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        // Cette fonction vérifie si l'attribution d'une valeur donnée dans une case donnée (de coordonnée "pos") dans un sudoku respecte les règles du sudoku
         public static bool ValueRespectsConstraints(int value, int[] pos, cell[,] sudoku)
         {
             int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
@@ -231,6 +236,7 @@ namespace TP2_Sudoku
             return true;
         }
 
+        // Cette fonction permet l'affichage console d'un sudoku
         public static void printThisSudoku(cell[,] sudoku)
         {
             for (int i = 0; i < 9; i++)
@@ -245,6 +251,7 @@ namespace TP2_Sudoku
             }
         }
 
+        // cette fonction rend une liste de Variables non assignés choisis via un MRV suivie d'un degree heuristic en cas d'égalité
         public static List<int[]> SelectUnassignedVariable(cell[,] sudoku)
         {
             List<int[]> rep = MRV(sudoku);
@@ -255,30 +262,34 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        // cette fonction rend une liste de valeurs pour la position indiqués ("variablePosition") parmis la liste de ses valeurs possibles 
+        // fournis ("possibleValues") choisis via Least constraining value
         public static List<int> SelectUnassignedValue(cell[,] sudoku, int[] variablePosition, List<int> possibleValues)
         {
             return LeastConstrainingValue(sudoku, variablePosition, possibleValues);
         }
 
+        // La fonction MRV (minimum remaining values)prend en paramètre un sudoku et rends une liste de position des cases 
+        // ayant le moins de valeurs possibles
         public static List<int[]> MRV(cell[,] sudoku)
         {
             List<int[]> rep = new List<int[]>();
-            int minimum = sudoku.GetLength(0);
+            int minimum = sudoku.GetLength(0); // "minimum" est le nombre de valeurs possibles minimum trouvé pour le moment
             for (int i = 0; i < sudoku.GetLength(1); i++)
             {
                 for (int j = 0; j < sudoku.GetLength(0); j++)
                 {
                     if (sudoku[i, j].value == 0)
                     {
-                        if (sudoku[i, j].possibleValues.Count == minimum)
+                        if (sudoku[i, j].possibleValues.Count == minimum) // si le nombre de valeurs possibles d'une case est égale au minimum,
                         {
-                            rep.Add(new int[] { i, j });
+                            rep.Add(new int[] { i, j }); // on ajoute cette case à la liste réponse
                         }
-                        else if (sudoku[i, j].possibleValues.Count < minimum)
+                        else if (sudoku[i, j].possibleValues.Count < minimum) // si le nombre de valeurs possibles d'une case est infèrieur au minimum,
                         {
-                            minimum = sudoku[i, j].possibleValues.Count;
-                            rep = new List<int[]>();
-                            rep.Add(new int[] { i, j });
+                            minimum = sudoku[i, j].possibleValues.Count; // le minimum est redéfini
+                            rep = new List<int[]>(); // La liste est vidée
+                            rep.Add(new int[] { i, j }); // et on ajoute la position de la case étudié à notre nouvelle liste
                         }
                     }
                 }
@@ -286,47 +297,51 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        // La fonction DegreeHeuristic rend la liste des position des cases influençant le plus grand nombre de variables encore non définies 
+        // parmis une liste entrée ("variables")
         public static List<int[]> DegreeHeuristic(cell[,] sudoku, List<int[]> variables)
         {
             List<int[]> rep = new List<int[]>();
-            int maxConstraints = 0;
+            int maxConstraints = 0; // "maxConstraints" est le nombre de variables influencé maximum trouvé pour le moment
 
-            foreach (int[] pos in variables)
+            foreach (int[] pos in variables) // pour chaque variables de la liste fournie
             {
                 int posConstraints = countConstraintsOnOtherVariables(sudoku, pos);
-                if (posConstraints == maxConstraints)
+                if (posConstraints == maxConstraints) // si elle influence un nombre de variables égale au  maximum actuel 
                 {
-                    rep.Add(pos);
+                    rep.Add(pos); // on l'ajoute à la liste réponse
                 }
-                else if (posConstraints > maxConstraints)
+                else if (posConstraints > maxConstraints) // si elle influence un nombre de variables supèrieur au  maximum actuel 
                 {
-                    maxConstraints = posConstraints;
-                    rep = new List<int[]>();
-                    rep.Add(pos);
+                    maxConstraints = posConstraints; // le maximum est redéfini
+                    rep = new List<int[]>(); // La liste de réponse est vidée
+                    rep.Add(pos); // on l'ajoute à la liste réponse
                 }
             }
             return rep;
         }
 
+        // la fonction countConstraintsOnOtherVariables prend en paramètre la position d'une case de notre sudoku est rend le nombre
+        // de variables encore non définie qu'elle influence
         public static int countConstraintsOnOtherVariables(cell[,] sudoku, int[] pos)
         {
-            int count = 0;
+            int count = 0; // count est un conteur que l'on incrémentera progressovement puis que l'on rendra
             int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
             int ybloc = pos[1] / 3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
             for (int i = 0; i < sudoku.GetLength(0); i++)
             {
-                if (sudoku[i, pos[1]].value == 0 && i != pos[0])
+                if (sudoku[i, pos[1]].value == 0 && i != pos[0]) // exploration de la colonne
                 {
                     count++;
                 }
-                if (sudoku[pos[0], i].value == 0 && i != pos[1])
+                if (sudoku[pos[0], i].value == 0 && i != pos[1]) // exploration de la ligne
                 {
                     count++;
                 }
 
                 int x = xbloc + i / 3;
                 int y = ybloc + i % 3;
-                if (sudoku[x, y].value == 0 && x != pos[0] && y != pos[1])
+                if (sudoku[x, y].value == 0 && x != pos[0] && y != pos[1]) // exploration du bloc
                 {
                     count++;
                 }
@@ -334,10 +349,12 @@ namespace TP2_Sudoku
             return count;
         }
 
+        // La fonction LeastConstrainingValue prend en paramètre la position d'une case à étudier et une liste de ses valeurs
+        // possibles et rend celles réduisant le moins les valeurs possibles des cases "voisines" de la case étudiée.
         public static List<int> LeastConstrainingValue(cell[,] sudoku, int[] pos, List<int> possibleValues)
         {
             List<int> rep = new List<int>();
-            int minimumCount = sudoku.GetLength(0) * 3;
+            int minimumCount = sudoku.GetLength(0) * 3; // "minimumCount" est le nombre de cases qui verraient leur nombre de valeurs possibles minimum trouvé pour le moment
             foreach (int value in possibleValues)
             {
                 int valueCount = countConstraintsOnOtherValues(sudoku, pos, value);
@@ -355,6 +372,8 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        // La fonction countConstraintsOnOtherValues prend en paramètre la position d'une case et une valeur à étudier
+        // et rend le nombre de variables "voisines" à celles étudiée qui verraient leur nombre de valeurs possibles diminuer si la valeur étudié était choisie.
         public static int countConstraintsOnOtherValues(cell[,] sudoku, int[] pos, int studiedValue)
         {
             int count = 0;
@@ -380,6 +399,7 @@ namespace TP2_Sudoku
             return count;
         }
 
+        // la fonction testSolution prend en paramètre un sudoku et rend un booléen indiquant si le sudoku entré est complété et valide
         public static bool testSolution(cell[,] solution)
         {
             if (!testSolutionLines(solution) || !testSolutionColumns(solution) || !testSolutionBlocs(solution))
@@ -389,6 +409,8 @@ namespace TP2_Sudoku
             return true;
         }
 
+        // la fonction testSolutionLines prend en paramètre un sudoku et rend un booléen indiquant si aucune ligne du sudoku n'a de 
+        // valeurs en double
         public static bool testSolutionLines(cell[,] solution)
         {
             for (int i = 0; i < solution.GetLength(0); i++)
@@ -405,6 +427,8 @@ namespace TP2_Sudoku
             return true;
         }
 
+        // la fonction testSolutionColumns prend en paramètre un sudoku et rend un booléen indiquant si aucune colonne du sudoku n'a de 
+        // valeurs en double
         public static bool testSolutionColumns(cell[,] solution)
         {
             for (int i = 0; i < solution.GetLength(1); i++)
@@ -423,6 +447,8 @@ namespace TP2_Sudoku
             return true;
         }
 
+        // la fonction testSolutionBlocs prend en paramètre un sudoku et rend un booléen indiquant si aucun bloce du sudoku n'a de 
+        // valeurs en double
         public static bool testSolutionBlocs(cell[,] solution)
         {
             for (int a = 0; a < solution.GetLength(0) / 3; a++)
@@ -444,6 +470,8 @@ namespace TP2_Sudoku
             return true;
         }
 
+        // la fonction gridToCells prend en paramètre un tableau d'entiers (correspondant à un sudoku) et rend un tableau de cellules
+        // correspondant au tableau de sudoku entré et dont les valeurs possibles des cases vides ont été renseignés
         public static cell[,] gridToCells(int[,] grid)
         {
             cell[,] rep = new cell[grid.GetLength(0), grid.GetLength(1)];
@@ -458,6 +486,8 @@ namespace TP2_Sudoku
             return rep;
         }
 
+        // la fonction getPossibleValues prend en paramètre un tableau d'entiers (correspondant à un sudoku) et la position d'une case à étudier 
+        // et rend, si celle si est vide, la liste de valeurs possibles pour cette case
         public static List<int> getPossibleValues(int[,] grid, int[] pos)
         {
             List<int> rep = new List<int>();
@@ -465,14 +495,14 @@ namespace TP2_Sudoku
             {
                 return rep;
             }
-            for (int i = 1; i <= grid.GetLength(0); i++)
+            for (int i = 1; i <= grid.GetLength(0); i++) // la liste réponse est remplies avec toutes les valeurs possibles
             {
                 rep.Add(i);
             }
             int xbloc = pos[0] / 3 * 3;  // position x du point supèrieur gauche du bloc auquel la valeur étudié appartient
             int ybloc = pos[1] / 3 * 3;  // position y du  point supèrieur gauche du bloc auquel la valeur étudié appartient
-            for (int i = 0; i < grid.GetLength(0); i++)
-            {
+            for (int i = 0; i < grid.GetLength(0); i++) // pour chaque "voisine" de la case étudié n'étant pas vide, si sa valeur 
+            {                                           // n'a pas encore été retiré de la liste réponse, on la retire de cette dernière
                 if (grid[i, pos[1]] != 0 && rep.Contains(grid[i, pos[1]]))
                 {
                     rep.Remove(grid[i, pos[1]]);
