@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TP2_Sudoku
@@ -20,11 +15,49 @@ namespace TP2_Sudoku
         private TextBox[,] ori = new TextBox[9, 9];
         private TextBox[,] solv = new TextBox[9, 9];
 
-        cell[,] sud;
+        private cell[,] sud;
+        private List<int[,]> listgrille = new List<int[,]>();
+
 
         public Form1()
         {
             InitializeComponent();
+            int[,] grid0 = {
+                {3, 0, 6, 5, 0, 8, 4, 0, 0},
+                {5, 2, 0, 0, 0, 0, 0, 0, 0},
+                {0, 8, 7, 0, 0, 0, 0, 3, 1},
+                {0, 0, 3, 0, 1, 0, 0, 8, 0},
+                {9, 0, 0, 8, 6, 3, 0, 0, 5},
+                {0, 5, 0, 0, 9, 0, 6, 0, 0},
+                {1, 3, 0, 0, 0, 0, 2, 5, 0},
+                {0, 0, 0, 0, 0, 0, 0, 7, 4},
+                {0, 0, 5, 2, 0, 6, 3, 0, 0}
+            };
+            int[,] grid1 = {
+                { 4, 6, 0, 2, 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 6, 4, 0, 0, 0, 7 },
+                { 0, 0, 3, 0, 0, 8, 0, 4, 9 },
+                { 0, 9, 0, 8, 6, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 8, 0, 9, 7, 0, 6, 0 },
+                { 6, 5, 0, 7, 0, 0, 4, 0, 0 },
+                { 7, 0, 0, 0, 1, 4, 0, 5, 0 },
+                { 0, 0, 0, 0, 0, 6, 0, 1, 3 }
+            };
+            int[,] grid2 = {
+                { 1, 0, 0, 0, 0, 7, 0, 9, 0 },
+                { 0, 3, 0, 0, 2, 0, 0, 0, 8 },
+                { 0, 0, 9, 6, 0, 0, 5, 0, 0 },
+                { 0, 0, 5, 3, 0, 0, 9, 0, 0 },
+                { 0, 1, 0, 0, 8, 0, 0, 0, 2 },
+                { 6, 0, 0, 0, 0, 4, 0, 0, 0 },
+                { 3, 0, 0, 0, 0, 0, 0, 1, 0 },
+                { 0, 4, 0, 0, 0, 0, 0, 0, 7 },
+                { 0, 0, 7, 0, 0, 0, 3, 0, 0 }
+            };
+            listgrille.Add(grid0);
+            listgrille.Add(grid1);
+            listgrille.Add(grid2);
             this.Load += new EventHandler(FormLoad);
         }
 
@@ -149,7 +182,9 @@ namespace TP2_Sudoku
         #region button
         private void loadButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Fonction non implémenter dans les delais accordes, navre", "ERREUR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Random r = new Random();
+            sud = Sudoku.gridToCells(listgrille[r.Next(0, listgrille.Count)]);
+            remplitGrid_ori();
         }
 
         private void resolveButton_Click(object sender, EventArgs e)
